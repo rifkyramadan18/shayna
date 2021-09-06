@@ -5,10 +5,10 @@
         <div class="container">
           <div class="ht-left">
             <div class="mail-service">
-              <i class="fa fa-envelope"></i> hello.shayna@gmail.com
+              <i class="fa fa-envelope"></i> rifkylamongan18@gmail.com
             </div>
             <div class="phone-service">
-              <i class="fa fa-phone"></i> +628 22081996
+              <i class="fa fa-phone"></i> +6281238564696
             </div>
           </div>
         </div>
@@ -30,38 +30,31 @@
                   Keranjang Belanja &nbsp;
                   <a href="#">
                     <i class="icon_bag_alt"></i>
-                    <span>3</span>
+                    <span>{{ keranjangUser.length }}</span>
                   </a>
                   <div class="cart-hover">
                     <div class="select-items">
                       <table>
-                        <tbody>
-                          <tr>
+                        <tbody v-if="keranjangUser.length > 0">
+                          <tr v-for="keranjang in keranjangUser" :key="keranjang.id">
                             <td class="si-pic">
-                              <img src="img/select-product-1.jpg" alt="" />
+                              <img class="photo-item" :src="keranjang.photo" alt="" />
                             </td>
                             <td class="si-text">
                               <div class="product-selected">
-                                <p>$60.00 x 1</p>
-                                <h6>Kabino Bedside Table</h6>
+                                <p>{{ keranjang.price }} IDR x 1</p>
+                                <h6>{{ keranjang.name }}</h6>
                               </div>
                             </td>
-                            <td class="si-close">
+                            <td @click="removeItem(keranjang.id)" class="si-close">
                               <i class="ti-close"></i>
                             </td>
                           </tr>
+                        </tbody>
+                        <tbody v-else>
                           <tr>
-                            <td class="si-pic">
-                              <img src="img/select-product-2.jpg" alt="" />
-                            </td>
-                            <td class="si-text">
-                              <div class="product-selected">
-                                <p>$60.00 x 1</p>
-                                <h6>Kabino Bedside Table</h6>
-                              </div>
-                            </td>
-                            <td class="si-close">
-                              <i class="ti-close"></i>
+                            <td class="text-center">
+                              Keranjang Kosong
                             </td>
                           </tr>
                         </tbody>
@@ -69,10 +62,12 @@
                     </div>
                     <div class="select-total">
                       <span>total:</span>
-                      <h5>$120.00</h5>
+                      <h5>{{ totalHarga }}.00 IDR</h5>
                     </div>
                     <div class="select-button">
-                      <a href="#" class="primary-btn view-card">VIEW CARD</a>
+                      
+                      <a href="#" class="primary-btn view-card"><router-link to="/cart" style="color: #fff;">VIEW CARD</router-link></a>
+                      
                       <a href="#" class="primary-btn checkout-btn">CHECK OUT</a>
                     </div>
                   </div>
@@ -88,6 +83,51 @@
 
 <script>
 export default {
-    name: 'HeaderShayna'
+    name: 'HeaderShayna',
+    data() {
+    return{
+      keranjangUser:[]
+    }
+  },
+  methods: {
+    removeItem(idx){
+      //cari tahu id
+      let keranjangUserStorage = JSON.parse(localStorage.getItem("keranjangUser"));
+      let itemKeranjangUserStorage = keranjangUserStorage.map(itemKeranjangUserStorage => itemKeranjangUserStorage.id);
+      //cocokan idx dengan id
+      let index = itemKeranjangUserStorage.findIndex(id => id == idx);
+      this.keranjangUser.splice(index, 1);
+      //save 
+      const parsed = JSON.stringify(this.keranjangUser);
+      localStorage.setItem('keranjangUser', parsed);
+      window.location.reload();
+    }
+  },
+  mounted(){
+    if (localStorage.getItem('keranjangUser')) {
+        try {
+          this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+        } catch(e) {
+          localStorage.removeItem('keranjangUser');
+        }
+      }
+  },
+  computed: {
+    totalHarga() {
+      return this.keranjangUser.reduce(function(items, data){
+        return items + data.price;
+      }, 0);
+    }
+  }
 }
 </script>
+
+<style scoped>
+.photo-item{
+  width: 50px;
+  height: 80px;
+}
+.view-card{
+  color: aliceblue;
+}
+</style>

@@ -27,22 +27,10 @@
                 <div class="product-pic-zoom">
                   <img class="product-big-img" :src="gambar_default" alt="" />
                 </div>
-                <div class="product-thumbs">
+                <div class="product-thumbs" v-if="productDetails.galleries.length > 0">
                   <carousel class="product-thumbs-track ps-slider" :items="3" :nav="false" :dots="false">
-                    <div class="pt" @click="changeImage(thumbs[0])" :class="thumbs[0] == gambar_default ? `active`:``">
-                      <img src="img/shirt1.jpg" alt="" />
-                    </div>
-
-                    <div class="pt" @click="changeImage(thumbs[1])" :class="thumbs[1] == gambar_default ? `active`:``">
-                      <img src="img/shirt2.jpg" alt="" />
-                    </div>
-
-                    <div class="pt" @click="changeImage(thumbs[2])" :class="thumbs[2] == gambar_default ? `active`:``">
-                      <img src="img/shirt3.jpg" alt="" />
-                    </div>
-
-                    <div class="pt" @click="changeImage(thumbs[3])" :class="thumbs[3] == gambar_default ? `active`:``">
-                      <img src="img/shirt4.jpg" alt="" />
+                    <div v-for="thumbProduct in productDetails.galleries" v-bind:key="thumbProduct.id" class="pt" @click="changeImage(thumbProduct.photo)" :class="thumbProduct.photo == gambar_default ? `active`:``">
+                      <img :src="thumbProduct.photo" alt="" />
                     </div>
                   </carousel>
                 </div>
@@ -50,39 +38,17 @@
               <div class="col-lg-6">
                 <div class="product-details text-left">
                   <div class="pd-title">
-                    <span>T-Shirt</span>
-                    <h3>Face Print T-Shirt</h3>
+                    <span>{{ productDetails.type }}</span>
+                    <h3>{{ productDetails.name }}</h3>
                   </div>
                   <div class="pd-desc">
-                    <p>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Corporis, error officia. Rem aperiam laborum voluptatum
-                      vel, pariatur modi hic provident eum iure natus quos non a
-                      sequi, id accusantium! Autem.
-                    </p>
-                    <p>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                      Quam possimus quisquam animi, commodi, nihil voluptate
-                      nostrum neque architecto illo officiis doloremque et
-                      corrupti cupiditate voluptatibus error illum. Commodi
-                      expedita animi nulla aspernatur. Id asperiores blanditiis,
-                      omnis repudiandae iste inventore cum, quam sint molestiae
-                      accusamus voluptates ex tempora illum sit perspiciatis.
-                      Nostrum dolor tenetur amet, illo natus magni veniam quia
-                      sit nihil dolores. Commodi ratione distinctio harum
-                      voluptatum velit facilis voluptas animi non laudantium, id
-                      dolorem atque perferendis enim ducimus? A exercitationem
-                      recusandae aliquam quod. Itaque inventore obcaecati, unde
-                      quam impedit praesentium veritatis quis beatae ea atque
-                      perferendis voluptates velit architecto?
-                    </p>
-                    <h4>499,900 IDR</h4>
+                    <p v-html="productDetails.description"></p>
+                    <h4>{{ productDetails.price }} IDR</h4>
                   </div>
                   <div class="quantity">
-                    <router-link to="/cart" class="primary-btn pd-cart">Add To Cart</router-link>
-                    <!-- <a href="shopping-cart.html" class="primary-btn pd-cart"
-                      >Add To Cart</a
-                    > -->
+                    <router-link to="/cart">
+                    <a @click="saveKeranjang(productDetails.id, productDetails.name, productDetails.price, productDetails.galleries[0].photo)" href="#" class="primary-btn pd-cart">Add To Cart</a>
+                    </router-link>
                   </div>
                 </div>
               </div>
@@ -104,6 +70,7 @@ import HeaderShayna from "@/components/HeaderShayna.vue";
 import FooterShayna from "@/components/FooterShayna.vue";
 import RelatedShayna from "@/components/RelatedShayna.vue";
 import carousel from "vue-owl-carousel";
+import axios from "axios";
 
 export default {
   name: "Product",
@@ -116,19 +83,45 @@ export default {
   },
   data() {
     return{
-      gambar_default: "img/shirt1.jpg",
-      thumbs: [
-        "img/shirt1.jpg",
-        "img/shirt2.jpg",
-        "img/shirt3.jpg",
-        "img/shirt4.jpg",
-      ]
+      gambar_default: "",
+      productDetails: [],
+      keranjangUser:[]
     }
+  },
+  mounted() {
+      if (localStorage.getItem('keranjangUser')) {
+        try {
+          this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+        } catch(e) {
+          localStorage.removeItem('keranjangUser');
+        }
+      }
+      axios.get("http://127.0.0.1:8001//api/products",{
+        params: {
+          id: this.$route.params.id,
+        }
+      }).then(res => (this.setDataPicture(res.data.data)))
+        .catch(err => console.log(err));
   },
   methods: {
     changeImage(urlImage) {
       this.gambar_default=urlImage;
-    }
+    },
+    setDataPicture(data){
+      this.productDetails = data;
+      this.gambar_default = data.galleries[0].photo;
+    },
+    saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct){
+      var productStored = {
+        "id": idProduct,
+        "name": nameProduct,
+        "price": priceProduct,
+        "photo": photoProduct,
+      }
+      this.keranjangUser.push(productStored);
+      const parsed = JSON.stringify(this.keranjangUser);
+      localStorage.setItem('keranjangUser', parsed);
+    },
   }
 };
 </script>

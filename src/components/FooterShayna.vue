@@ -11,13 +11,13 @@
               /></a>
             </div>
             <ul>
-              <li>Address: Setra Duta, Bandung</li>
-              <li>Phone: +628 22081996</li>
-              <li>Email: hello.shayna@gmail.com</li>
+              <li>Address: Jl Ikan Lele 1 No 14, Lamongan</li>
+              <li>Phone: +6281238564696</li>
+              <li>Email: rifkylamongan18@gmail.com</li>
             </ul>
             <div class="footer-social">
-              <a href="#"><i class="fa fa-facebook"></i></a>
-              <a href="#"><i class="fa fa-instagram"></i></a>
+              <a href="https://www.facebook.com/rifkyra18" target="_blank"><i class="fa fa-facebook"></i></a>
+              <a href="https://www.instagram.com/rifky_ramadan18/" target="_blank"><i class="fa fa-instagram"></i></a>
               <a href="#"><i class="fa fa-twitter"></i></a>
               <a href="#"><i class="fa fa-pinterest"></i></a>
             </div>
